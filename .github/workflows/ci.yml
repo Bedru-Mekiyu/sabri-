@@ -1,0 +1,41 @@
+name: Portfolio CI
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Validate Repository Structure and HTML Files
+        run: |
+          python3 -c "
+          import glob, os, sys
+
+          html_files = glob.glob('*.html')
+          if not html_files:
+              print('Error: No HTML files found in root directory.')
+              sys.exit(1)
+
+          print(f'Found {len(html_files)} HTML files: {html_files}')
+
+          required_dirs = ['assets', 'forms']
+          for d in required_dirs:
+              if not os.path.isdir(d):
+                  print(f'Error: Required directory {d} missing.')
+                  sys.exit(1)
+
+          print('Repository structure and essential files verified successfully.')
+          "
